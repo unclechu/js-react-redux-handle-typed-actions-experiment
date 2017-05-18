@@ -7,12 +7,6 @@ import T from 'prop-types';
 import IMT from 'react-immutable-proptypes';
 
 export default combineReducers({
-  // app: handleActions({
-  //   [actions.setAppTitle.toString()]: (state, {payload: {title}}) => state.set('title', title)
-  // }, fromJS({
-  //   title: 'Typed redux actions experiment'
-  // }))
-
   app: handleTypedActions(
     [
       [actions.setAppTitle, (state, {payload: {title}}) => state.set('title', title)]
@@ -25,5 +19,15 @@ export default combineReducers({
     IMT.mapContains({
       title: T.string.isRequired
     }).isRequired
+  ),
+
+  foo: handleTypedActions(
+    [
+      [actions.setAppTitle, (state, {payload: {title}}) => state.set('anotherTitle', title)]
+    ],
+
+    fromJS({
+      anotherTitle: 'default value'
+    })
   )
 });
