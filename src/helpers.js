@@ -4,11 +4,13 @@ import { createAction } from 'redux-actions';
 import { handleActions } from 'redux-actions';
 import T, { checkPropTypes } from 'prop-types';
 
+const typeSpecsCollection = {};
+
 // `.toString()` of action returns action type
 // `.payloadTypeSpec` contains payload type checker
 export const createActions = (scope, types) => mapValues(types, (typeSpec, key) => {
   const actionCreator = createAction(`${scope.toUpperCase()}@${snakeCase(key).toUpperCase()}`);
-  actionCreator.payloadTypeSpec = typeSpec;
+  typeSpecsCollection[actionCreator] = typeSpec;
   return actionCreator;
 }, {});
 
@@ -19,16 +21,16 @@ export const createActions = (scope, types) => mapValues(types, (typeSpec, key) 
 //   2. Input state and payload for reducer
 //   3. New state got from reducer (optional)
 export const handleTypedActions = (handlers, initialState, stateTypeSpec = T.any) => {
-  const result = reduce(handlers, (acc, [actionCreator, reducer]) => {
+  const result = reduce(handlers, (acc, actionReducer, actionType) => {
     if (process.env.NODE_ENV !== 'production') {
-      acc[actionCreator.toString()] = (state, action) => {
+      acc[actionType] = (state, action) => {
 
         checkPropTypes(
-          { state: stateTypeSpec, payload: actionCreator.payloadTypeSpec },
+          { state: stateTypeSpec, payload: typeSpecsCollection[actionType] },
           { state, payload: action.payload }
         );
 
-        const newState = reducer(state, action);
+        const newState = actionReducer(state, action);
 
         checkPropTypes(
           { newState: stateTypeSpec },
@@ -38,7 +40,7 @@ export const handleTypedActions = (handlers, initialState, stateTypeSpec = T.any
         return newState;
       };
     } else {
-      acc[actionCreator.toString()] = reducer;
+      acc[actionType] = actionReducer;
     }
 
     return acc;

@@ -1,28 +1,44 @@
 import React from 'react';
 import { compose, setPropTypes, withHandlers, withState } from 'recompose';
 import { connect } from 'react-redux';
-import { actions } from './actions';
+import { actions } from './redux';
 import T from 'prop-types';
 
-const App = ({title, onTitleInputChange, appTitle, updateTitle, anotherTitle}) => <div>
+const App = ({
+  title,
+  onTitleInputChange,
+  appTitle,
+  updateTitle,
+  anotherTitle,
+  bar,
+  setBarText,
+  resetBarText,
+}) => <div>
   <h1>{appTitle}</h1>
   <form>
     <input type="text" value={title} onChange={onTitleInputChange}/>
     {' '}
-    <button onClick={updateTitle}>change title</button>
+    <button onClick={updateTitle}>Change title</button>
   </form>
-  <h2>{anotherTitle}</h2>
+  <h2>Additional title field from store: {anotherTitle}</h2>
+  <h3>Bar text: {bar}</h3>
+  <button onClick={setBarText}>Change bar text</button>
+  {' '}
+  <button onClick={resetBarText}>Reset bar text</button>
 </div>;
 
 export default compose(
   connect(
     store => ({
-      appTitle: store.getIn(['app', 'app', 'title']),
-      anotherTitle: store.getIn(['app', 'foo', 'anotherTitle'])
+      appTitle     : store.getIn(['app', 'app', 'title']),
+      bar          : store.getIn(['app', 'app', 'bar']),
+      anotherTitle : store.getIn(['app', 'foo', 'anotherTitle'])
     }),
 
     {
-      setAppTitle: actions.setAppTitle
+      setAppTitle  : actions.setAppTitle,
+      setBarText   : () => actions.setBarText('new bar text'),
+      resetBarText : () => actions.setBarText(),
     }
   ),
 
@@ -40,11 +56,14 @@ export default compose(
   }),
 
   setPropTypes({
-    appTitle: T.string.isRequired,
-    updateTitle: T.func.isRequired,
-    title: T.string.isRequired,
-    setTitle: T.func.isRequired,
-    onTitleInputChange: T.func.isRequired,
-    anotherTitle: T.string.isRequired,
+    appTitle           : T.string.isRequired,
+    updateTitle        : T.func.isRequired,
+    title              : T.string.isRequired,
+    setTitle           : T.func.isRequired,
+    onTitleInputChange : T.func.isRequired,
+    anotherTitle       : T.string.isRequired,
+    bar                : T.string.isRequired,
+    setBarText         : T.func.isRequired,
+    resetBarText       : T.func.isRequired,
   })
 )(App);

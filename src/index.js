@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { combineReducers } from 'redux-immutable';
 import { Map } from 'immutable';
-import appReducer from './App/reducers';
+import { reducers as appReducer } from './App/redux';
 import App from './App';
 
 const store = createStore(combineReducers({
